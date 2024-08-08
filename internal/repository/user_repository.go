@@ -10,8 +10,20 @@ import (
 )
 
 type UserRepositoryInterface interface {
+	CreateUser
+	GetUser
+	VerifyPassword
+}
+
+type CreateUser interface {
 	CreateUser(ctx context.Context, user *domain.User) (domain.User, error)
+}
+
+type GetUser interface {
 	GetUser(ctx context.Context, username string) (domain.User, error)
+}
+
+type VerifyPassword interface {
 	VerifyPassword(ctx context.Context, username, password string) error
 }
 

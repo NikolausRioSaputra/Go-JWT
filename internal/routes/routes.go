@@ -7,14 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(userHandler *handler.UserHandler) *gin.Engine {
-	r := gin.Default()
+func InitializeRoutes(router *gin.Engine, userHandler handler.UserHandlerInterface) {
+	router.POST("/register", userHandler.Register)
+	router.POST("/login", userHandler.Login)
 
-	r.POST("/register", userHandler.Register)
-	r.POST("/login", userHandler.Login)
-
-	protected := r.Group("/", middleware.AuthMiddleware("secret"))
+	protected := router.Group("/", middleware.AuthMiddleware("secret"))
 	protected.GET("/welcome", userHandler.Welcome)
-
-	return r
 }

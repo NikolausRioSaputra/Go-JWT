@@ -8,8 +8,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type UserHandlerInterface interface {
+	Login(c *gin.Context)
+	Register(c *gin.Context)
+	Welcome(c *gin.Context)
+}
 type UserHandler struct {
-	UserUsecase *usecase.UserUsecase
+	UserUsecase usecase.UserUsecase
+}
+
+func NewUserHandler (userUsecase usecase.UserUsecase) UserHandlerInterface {
+	return &UserHandler{
+		UserUsecase: userUsecase,
+	}
 }
 
 func (h *UserHandler) Register(c *gin.Context) {

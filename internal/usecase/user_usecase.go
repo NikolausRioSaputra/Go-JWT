@@ -11,16 +11,39 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+type UserUsecaseInterface interface {
+	Login
+	Register
+	Welcome
+}
+
+type Login interface {
+	Login(ctx context.Context, user domain.User) (string, error)
+}
+
+type Register interface {
+	Register(ctx context.Context, user *domain.User) error
+}
+type Welcome interface {
+	Welcome(ctx context.Context, tokenString string) (string, error)
+}
+
 type UserUsecase struct {
 	UserRepo repository.UserRepositoryInterface
 }
 
-func (u *UserUsecase) Register(ctx context.Context, user *domain.User) error {
+func NewUserusecase(userRepo repository.UserRepositoryInterface) UserUsecase {
+	return UserUsecase{
+		UserRepo: userRepo,
+	}
+}
+
+func (u UserUsecase) Register(ctx context.Context, user *domain.User) error {
 	_, err := u.UserRepo.CreateUser(ctx, user)
 	return err
 }
 
-func (u *UserUsecase) Login(ctx context.Context, user domain.User) (string, error) {
+func (u UserUsecase) Login(ctx context.Context, user domain.User) (string, error) {
 	err := u.UserRepo.VerifyPassword(ctx, user.Username, user.Password)
 	if err != nil {
 		return "", err
@@ -42,7 +65,7 @@ func (u *UserUsecase) Login(ctx context.Context, user domain.User) (string, erro
 	return token, nil
 }
 
-func (u *UserUsecase) Welcome(ctx context.Context, tokenString string) (string, error) {
+func (u UserUsecase) Welcome(ctx context.Context, tokenString string) (string, error) {
 	claims := &domain.Claims{
 		RegisteredClaims: jwt.RegisteredClaims{},
 	}

@@ -6,6 +6,8 @@ import (
 	"jwtGolang/internal/repository"
 	"jwtGolang/internal/routes"
 	"jwtGolang/internal/usecase"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -13,9 +15,16 @@ func main() {
 	defer database.Close()
 
 	userRepo := repository.NewUserRepository(database)
-	userUsecase := &usecase.UserUsecase{UserRepo: userRepo}
-	userHandler := &handler.UserHandler{UserUsecase: userUsecase}
+	userUsecase := usecase.NewUserusecase(userRepo)
+	userHandler := handler.NewUserHandler(userUsecase)
 
-	r := routes.SetupRouter(userHandler)
-	r.Run(":8080")
+	// Initialize the router
+	route := gin.New()
+	routes.InitializeRoutes(route, userHandler)
+
+	// Start the server
+	if err := route.Run(":8080"); err != nil {
+		panic(err)
+	}
+
 }
